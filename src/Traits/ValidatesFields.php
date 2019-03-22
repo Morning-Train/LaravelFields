@@ -4,11 +4,17 @@ namespace MorningTrain\Laravel\Fields\Traits;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 
 trait ValidatesFields
 {
+
+    use ValidatesRequests;
+
     protected function performValidation(Model $model, Request $request, bool $patch = false)
     {
         // Compute validation rules
@@ -27,9 +33,15 @@ trait ValidatesFields
         if ($patch) {
             $rules = $this->getPatchValidationRules($rules);
         }
-
+        
         // Validate
-        $request->validate($rules);
+        try {
+            $this->validate($request, $rules);
+        } catch (ValidationException $exception) {
+            throw new HttpResponseException(response()->json([
+                "errors" => $exception->errors()
+            ], 422));
+        }
     }
 
     protected function getPatchValidationRules(array $rules)
