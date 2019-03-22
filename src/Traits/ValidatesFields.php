@@ -1,6 +1,6 @@
 <?php
 
-namespace MorningTrain\Laravel\Fields;
+namespace MorningTrain\Laravel\Fields\Traits;
 
 
 use Illuminate\Database\Eloquent\Model;
