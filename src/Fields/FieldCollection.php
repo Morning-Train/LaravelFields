@@ -99,6 +99,11 @@ class FieldCollection implements FieldContract
         return $this;
     }
 
+    protected function getCollection()
+    {
+        return $this->collection;
+    }
+
     /*
      -------------------------------
      Names
@@ -142,6 +147,16 @@ class FieldCollection implements FieldContract
         return $this->requestName ?: $this->name;
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getRequestPath()
+    {
+        return $this->getRequestName();
+    }
+
     /*
      -------------------------------
      Validation
@@ -180,10 +195,11 @@ class FieldCollection implements FieldContract
     {
         $resolvedModel = $this->resolveModel($model, $this->getPropertyName());
 
-        $rules = $this->collection->reduce(function ($acc, FieldContract $field) use ($resolvedModel) {
+        $rules = $this->getCollection()->reduce(function ($acc, FieldContract $field) use ($resolvedModel) {
             $rules = $field->getValidationRules($resolvedModel);
             return is_array($rules) ? array_merge($acc, $rules) : $acc;
         }, []);
+
 
         return $this->processRules(
             $model,
@@ -258,7 +274,7 @@ class FieldCollection implements FieldContract
         if ($this->checkRequest($request)) {
             $resolvedModel = $this->resolveModel($model, $this->getPropertyName());
 
-            $this->collection->each(function (FieldContract $field) use ($resolvedModel, $request, $timeline) {
+            $this->getCollection()->each(function (FieldContract $field) use ($resolvedModel, $request, $timeline) {
                 $field->update($resolvedModel, $request, $timeline);
             });
 

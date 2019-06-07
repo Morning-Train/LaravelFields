@@ -2,13 +2,13 @@
 
 namespace MorningTrain\Laravel\Fields\Fields;
 
-use MorningTrain\Laravel\Fields\Contracts\FieldContract;
-
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 
 class RelationshipField extends FieldCollection
 {
@@ -20,7 +20,7 @@ class RelationshipField extends FieldCollection
 		parent::__construct($name);
 
 		$this->strict	= $strict;
-		$this->relation	= camel_case($name);
+		$this->relation	= Str::camel($name);
 
 		$this->updatesAt(Field::BEFORE_SAVE);
 	}

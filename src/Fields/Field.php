@@ -68,6 +68,16 @@ class Field implements FieldContract
         return $this->requestName ?: $this->name;
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getRequestPath()
+    {
+        return $this->getRequestName();
+    }
+
     /*
      -------------------------------
      Validation
@@ -78,10 +88,13 @@ class Field implements FieldContract
      * @var string|array|Closure
      */
     protected $validator;
+    protected $validatorName;
 
-    public function validates($validator)
+    public function validates($validator, string $validatorName = null)
     {
         $this->validator = $validator;
+        $this->validatorName = $validatorName;
+
         return $this;
     }
 
@@ -98,9 +111,10 @@ class Field implements FieldContract
     protected function getValidatorRules(Model $model)
     {
         $validator = $this->getValidator();
-        $rules = $validator instanceof Closure ? $validator($model) : $validator;
+        $rules     = $validator instanceof Closure ? $validator($model) : $validator;
+        $name      = $this->validatorName ?? $this->getRequestName();
 
-        return is_string($rules) ? [$this->getRequestName() => $rules] : $rules;
+        return is_string($rules) ? [$name => $rules] : $rules;
     }
 
     public function getValidationRules(Model $model)
@@ -198,7 +212,8 @@ class Field implements FieldContract
         return $update(
             $model,
             $this->getPropertyName(),
-            $this->processValue($model, $this->getRequestValue($request))
+            $this->processValue($model, $this->getRequestValue($request)),
+            $this
         );
     }
 
