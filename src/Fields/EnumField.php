@@ -27,6 +27,15 @@ class EnumField extends Field
         return $this;
     }
 
+    protected $validatorName = null;
+
+    public function validatorName(string $validatorName = null)
+    {
+        $this->validatorName = $validatorName;
+
+        return $this;
+    }
+
     public function __construct(string $name = null)
     {
         parent::__construct($name);
@@ -43,7 +52,7 @@ class EnumField extends Field
             }
 
             return empty($rules) ? null : implode('|', $rules);
-        });
+        }, $this->validatorName);
     }
 
 }
