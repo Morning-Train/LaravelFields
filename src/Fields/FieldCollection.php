@@ -237,7 +237,7 @@ class FieldCollection implements FieldContract
 
     protected function getRequestValue(Request $request)
     {
-        return $request->get($this->getRequestName());
+        return $request->input($this->getRequestName());
     }
 
     protected function resolveModel(Model $model, $attribute)
