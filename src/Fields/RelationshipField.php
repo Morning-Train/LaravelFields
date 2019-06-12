@@ -58,6 +58,15 @@ class RelationshipField extends FieldCollection
         return $this;
     }
 
+    protected $dbDelete = false;
+
+    public function dbDelete($dbDelete = true)
+    {
+        $this->dbDelete = $dbDelete;
+
+        return $this;
+    }
+
     /*
      -------------------------------
      Getters
@@ -222,7 +231,9 @@ class RelationshipField extends FieldCollection
             }
 
             if ($this->remove_missing === true) {
-                $resolvedModel->{$this->relation}()->whereNotIn('id', $ids)->delete();
+                $this->dbDelete ?
+                    $resolvedModel->{$this->relation}()->whereNotIn('id', $ids)->delete() :
+                    $resolvedModel->{$this->relation}()->whereNotIn('id', $ids)->get()->each->delete();
             }
 
         }
