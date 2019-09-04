@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 
@@ -178,7 +179,7 @@ class RelationshipField extends FieldCollection
             $value = [$value];
 
 			$content = $request->all();
-			array_set($content, $this->getRequestName(), $value);
+			Arr::set($content, $this->getRequestName(), $value);
 			$request->merge($content);
         }
 
