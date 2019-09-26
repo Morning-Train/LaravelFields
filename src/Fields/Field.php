@@ -6,6 +6,7 @@ namespace MorningTrain\Laravel\Fields\Fields;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 use MorningTrain\Laravel\Support\Traits\StaticCreate;
 
@@ -76,6 +77,37 @@ class Field implements FieldContract
     public function getRequestPath()
     {
         return $this->getRequestName();
+    }
+
+    /*
+     -------------------------------
+     Permissions
+     -------------------------------
+     */
+
+    protected $permissions = [];
+
+    public function can($permissions)
+    {
+        $this->permissions = (array)$permissions;
+
+        return $this;
+    }
+
+    public function getPermissions(): array
+    {
+        return $this->permissions;
+    }
+
+    public function checkPermissions(Model $model): bool
+    {
+        foreach ($this->permissions as $permission) {
+            if (!Auth::check() || !Auth::user()->can($permission, $model)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /*
@@ -223,7 +255,7 @@ class Field implements FieldContract
             return;
         }
 
-        if ($this->checkRequest($request)) {
+        if ($this->checkRequest($request) && $this->checkPermissions($model)) {
             $this->performUpdate(
                 $model,
                 $request
