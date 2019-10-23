@@ -219,15 +219,19 @@ class FieldCollection implements FieldContract
      */
     protected $updateTime = 'before';
 
-    public function updatesAt(string $updateTime)
+    public function updatesAt($updateTime)
     {
         $this->updateTime = $updateTime;
         return $this;
     }
 
-    protected function getUpdateTime()
+    protected function getUpdateTime(Model $model)
     {
-        return $this->updateTime;
+        $updateTime = $this->updateTime;
+
+        return $updateTime instanceof Closure ?
+            (string)$updateTime($model) :
+            (string)$updateTime;
     }
 
     protected function checkRequest(Request $request)
@@ -267,7 +271,7 @@ class FieldCollection implements FieldContract
 
     public function update(Model $model, Request $request, string $timeline)
     {
-        if (($this->getUpdateTime() !== $timeline) && ($this->getUpdateTime() !== Field::BOTH)) {
+        if (($this->getUpdateTime($model) !== $timeline) && ($this->getUpdateTime($model) !== Field::BOTH)) {
             return;
         }
 

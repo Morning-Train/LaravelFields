@@ -192,26 +192,30 @@ class Field implements FieldContract
      */
     protected $updateTime = 'before';
 
-    public function updates(Closure $closure, string $updateTime = null)
+    public function updates(Closure $closure, $updateTime = null)
     {
         $this->update = $closure;
 
-        if (is_string($updateTime)) {
+        if (!is_null($updateTime)) {
             $this->updateTime = $updateTime;
         }
 
         return $this;
     }
 
-    public function updatesAt(string $updateTime)
+    public function updatesAt($updateTime)
     {
         $this->updateTime = $updateTime;
         return $this;
     }
 
-    protected function getUpdateTime()
+    protected function getUpdateTime(Model $model)
     {
-        return $this->updateTime;
+        $updateTime = $this->updateTime;
+
+        return $updateTime instanceof Closure ?
+            (string)$updateTime($model) :
+            (string)$updateTime;
     }
 
     public function getUpdateMethod()
@@ -251,7 +255,7 @@ class Field implements FieldContract
 
     public function update(Model $model, Request $request, string $timeline)
     {
-        if (($this->getUpdateTime() !== $timeline) && ($this->getUpdateTime() !== static::BOTH)) {
+        if (($this->getUpdateTime($model) !== $timeline) && ($this->getUpdateTime($model) !== static::BOTH)) {
             return;
         }
 
