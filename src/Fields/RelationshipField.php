@@ -27,6 +27,29 @@ class RelationshipField extends FieldCollection
     }
 
     //////////////////////////////////
+    /// Helpers to save order of items
+    //////////////////////////////////
+
+    protected $set_order_to = null;
+
+    public function setOrderTo($set_order_to)
+    {
+        $this->set_order_to = $set_order_to;
+
+        return $this;
+    }
+
+    protected function shouldSetOrder()
+    {
+        return $this->set_order_to !== null;
+    }
+
+    protected function setOrder(Model $model, $index)
+    {
+        $model->{$this->set_order_to} = $index;
+    }
+
+    //////////////////////////////////
     /// Setters
     //////////////////////////////////
 
@@ -152,6 +175,10 @@ class RelationshipField extends FieldCollection
         $fields->each(function (FieldContract $field) use ($related, $request) {
             $field->update($related, $request, Field::AFTER_SAVE);
         });
+
+        if($this->shouldSetOrder()) {
+            $this->setOrder($related, $index);
+        }
 
         if ($related->isDirty()) {
             $related->save();
