@@ -13,35 +13,33 @@ use MorningTrain\Laravel\Fields\Contracts\FieldContract;
 
 class RelationshipField extends FieldCollection
 {
-	protected $strict;
-	protected $relation;
+    protected $strict;
+    protected $relation;
 
     public function __construct(string $name = null, bool $strict = false)
-	{
-		parent::__construct($name);
+    {
+        parent::__construct($name);
 
-		$this->strict	= $strict;
-		$this->relation	= Str::camel($name);
+        $this->strict = $strict;
+        $this->relation = Str::camel($name);
 
-		$this->updatesAt(Field::BEFORE_SAVE);
-	}
+        $this->updatesAt(Field::BEFORE_SAVE);
+    }
 
-    /*
-     -------------------------------
-     Setters
-     -------------------------------
-     */
+    //////////////////////////////////
+    /// Setters
+    //////////////////////////////////
 
-	protected $fields = [];
+    protected $fields = [];
 
-	public function fields(array $fields)
-	{
-		$this->fields = $fields;
+    public function fields(array $fields)
+    {
+        $this->fields = $fields;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	protected $resource;
+    protected $resource;
 
     public function resource(string $resource)
     {
@@ -50,7 +48,7 @@ class RelationshipField extends FieldCollection
         return $this;
     }
 
-	protected $remove_missing = false;
+    protected $remove_missing = false;
 
     public function removeMissing($remove_missing = true)
     {
@@ -68,135 +66,131 @@ class RelationshipField extends FieldCollection
         return $this;
     }
 
-    /*
-     -------------------------------
-     Getters
-     -------------------------------
-     */
+    //////////////////////////////////
+    /// Getters
+    //////////////////////////////////
 
-	protected function getCollection()
-	{
-		$required = $this->checkRequest(request());
-		if (!$required) {
-			return collect();
-		}
+    protected function getCollection()
+    {
+        $required = $this->checkRequest(request());
+        if (!$required) {
+            return collect();
+        }
 
-		$collection = [];
+        $collection = [];
 
-		if (!empty($this->fields)) {
-			$collection = $this->fields;
+        if (!empty($this->fields)) {
+            $collection = $this->fields;
 
-		} else if (method_exists($this->resource, 'getFields')) {
-			$collection = $this->resource::getFields();
-		}
+        } else {
+            if (method_exists($this->resource, 'getFields')) {
+                $collection = $this->resource::getFields();
+            }
+        }
 
-		return collect($collection)
-			->map(function (FieldContract $field) {
-				$field->requestName("{$this->getRequestName()}.{$field->getName()}");
-				return $field;
-			});
-	}
+        return collect($collection)
+            ->map(function (FieldContract $field) {
+                $field->requestName("{$this->getRequestName()}.{$field->getName()}");
+                return $field;
+            });
+    }
 
-	protected function getRelationUpdateTime(Model $model)
-	{
-		return $this->isSingleRelation($model) ?
-			Field::BEFORE_SAVE :
-			Field::AFTER_SAVE;
-	}
+    protected function getRelationUpdateTime(Model $model)
+    {
+        return $this->isSingleRelation($model) ?
+            Field::BEFORE_SAVE :
+            Field::AFTER_SAVE;
+    }
 
-    /*
-     -------------------------------
-     Methods
-     -------------------------------
-     */
+    //////////////////////////////////
+    /// Methods
+    //////////////////////////////////
 
-	protected function updateRelation(Model $model, Model $related, Relation $relation)
-	{
-		if ($relation instanceof BelongsTo) {
-			$related->save();
-			$model->{$relation->getForeignKey()} = $related->id;
-		}
+    protected function updateRelation(Model $model, Model $related, Relation $relation)
+    {
+        if ($relation instanceof BelongsTo) {
+            $related->save();
+            $model->{$relation->getForeignKey()} = $related->id;
+        }
 
-		if ($relation instanceof HasOneOrMany) {
-			$related->{$relation->getForeignKeyName()} = $model->id;
-			$related->save();
-		}
-	}
+        if ($relation instanceof HasOneOrMany) {
+            $related->{$relation->getForeignKeyName()} = $model->id;
+            $related->save();
+        }
+    }
 
-	protected function updateRelated(Model $model, Request $request, string $timeline, $value, int $index)
-	{
-		$relation_type	= $model->{$this->relation}();
-		$related_class	= $relation_type->getRelated();
+    protected function updateRelated(Model $model, Request $request, string $timeline, $value, int $index)
+    {
+        $relation_type = $model->{$this->relation}();
+        $related_class = $relation_type->getRelated();
         $primary_key = (new $related_class())->getKeyName();
 
-		$related	= null;
+        $related = null;
 
-		if (!empty($value) && isset($value[$primary_key])) {
-			$related = $related_class::where($primary_key, $value[$primary_key])->first();
-		}
+        if (!empty($value) && isset($value[$primary_key])) {
+            $related = $related_class::where($primary_key, $value[$primary_key])->first();
+        }
 
-		if ($related === null) {
-			$related = new $related_class();
-		}
+        if ($related === null) {
+            $related = new $related_class();
+        }
 
-		$fields = $this->getCollection();
+        $fields = $this->getCollection();
 
-		$fields->each(function (FieldContract $field) use ($related, $request, $index) {
-			$base_name = $this->getRequestName();
-		    $old_request_name = explode($base_name, $field->getRequestPath());
-			$new_request_name = join("{$base_name}.{$index}", $old_request_name);
+        $fields->each(function (FieldContract $field) use ($related, $request, $index) {
+            $base_name = $this->getRequestName();
+            $old_request_name = explode($base_name, $field->getRequestPath());
+            $new_request_name = join("{$base_name}.{$index}", $old_request_name);
 
-		    $field->requestName($new_request_name); //New request name
+            $field->requestName($new_request_name); //New request name
 
-			$field->update($related, $request, Field::BEFORE_SAVE);
-		});
+            $field->update($related, $request, Field::BEFORE_SAVE);
+        });
 
         $this->updateRelation($model, $related, $relation_type);
 
         $fields->each(function (FieldContract $field) use ($related, $request) {
-			$field->update($related, $request, Field::AFTER_SAVE);
-		});
+            $field->update($related, $request, Field::AFTER_SAVE);
+        });
 
-        if($related->isDirty()){
+        if ($related->isDirty()) {
             $related->save();
         }
 
         return $related;
-	}
+    }
 
-	protected function isSingleRelation(Model $model)
-	{
-		$relation = $model->{$this->relation}();
+    protected function isSingleRelation(Model $model)
+    {
+        $relation = $model->{$this->relation}();
 
-		return $relation instanceof BelongsTo;
-	}
+        return $relation instanceof BelongsTo;
+    }
 
     protected function resolveRequestEntries(Model $model, Request $request)
     {
         $value = $this->getRequestValue($request);
 
-        if($this->isSingleRelation($model)){
+        if ($this->isSingleRelation($model)) {
             $value = [$value];
 
-			$content = $request->all();
-			Arr::set($content, $this->getRequestName(), $value);
-			$request->merge($content);
+            $content = $request->all();
+            Arr::set($content, $this->getRequestName(), $value);
+            $request->merge($content);
         }
 
         return $value;
     }
 
-    /*
-     -------------------------------
-     Overwrites
-     -------------------------------
-     */
+    //////////////////////////////////
+    /// Overwrites
+    //////////////////////////////////
 
     protected function checkRequest(Request $request)
     {
-		return $this->strict ?
-			true :
-			$request->has($this->getRequestName()) && is_array($this->getRequestValue($request));
+        return $this->strict ?
+            true :
+            $request->has($this->getRequestName()) && is_array($this->getRequestValue($request));
     }
 
     public function update(Model $model, Request $request, string $timeline)
@@ -213,8 +207,8 @@ class RelationshipField extends FieldCollection
 
             $resolvedModel = $this->resolveModel($model, $this->getPropertyName());
 
-            if(!empty($entries)){
-                foreach($entries as $index => $entry){
+            if (!empty($entries)) {
+                foreach ($entries as $index => $entry) {
 
                     $related = $this->updateRelated($resolvedModel, $request, $timeline, $entry, $index);
 
