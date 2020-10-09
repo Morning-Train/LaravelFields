@@ -2,7 +2,7 @@
 
 namespace MorningTrain\Laravel\Fields\Fields;
 
-use App\Support\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class ValidatorField extends Field
