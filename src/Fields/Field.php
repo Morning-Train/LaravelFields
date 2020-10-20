@@ -112,6 +112,24 @@ class Field implements FieldContract
 
     /*
      -------------------------------
+     Default value
+     -------------------------------
+     */
+
+    /**
+     * @var string
+     */
+    protected $defaultValue = null;
+
+    public function defaultValue($value = null)
+    {
+        $this->defaultValue = $value;
+
+        return $this;
+    }
+
+    /*
+     -------------------------------
      Validation
      -------------------------------
      */
@@ -232,7 +250,7 @@ class Field implements FieldContract
 
     protected function getRequestValue(Request $request)
     {
-        return $request->input($this->getRequestName());
+        return $request->input($this->getRequestName(), $this->defaultValue);
     }
 
     protected function processValue(Model $model, $value)
