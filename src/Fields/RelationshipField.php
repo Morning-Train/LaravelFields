@@ -25,6 +25,15 @@ class RelationshipField extends FieldCollection
 
         $this->updatesAt(Field::BEFORE_SAVE);
     }
+    
+    protected $is_single = null;
+
+    public function single($is_single = true)
+    {
+        $this->is_single = $is_single;
+
+        return $this;
+    }
 
     //////////////////////////////////
     /// Helpers to save order of items
@@ -198,7 +207,7 @@ class RelationshipField extends FieldCollection
     {
         $value = $this->getRequestValue($request);
 
-        if ($this->isSingleRelation($model)) {
+        if ($this->isSingleRelation($model) || $this->is_single === true) {
             $value = [$value];
 
             $content = $request->all();
