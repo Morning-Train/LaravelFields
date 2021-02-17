@@ -142,8 +142,15 @@ class Field implements FieldContract
 
     public function validates($validator, string $validatorName = null)
     {
+        $this->validatorName = $validatorName ?? $this->getRequestName();
+
+        if(is_array($validator) && count($validator) === count($validator, COUNT_RECURSIVE)) {
+            $validator = [
+                $this->validatorName => $validator
+            ];
+        }
+
         $this->validator = $validator;
-        $this->validatorName = $validatorName;
 
         return $this;
     }
