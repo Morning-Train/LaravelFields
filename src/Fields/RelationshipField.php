@@ -35,6 +35,13 @@ class RelationshipField extends FieldCollection
         return $this;
     }
 
+    public function relation($relationName = null)
+    {
+        $this->relation = $relationName;
+
+        return $this;
+    }
+
     //////////////////////////////////
     /// Helpers to save order of items
     //////////////////////////////////
