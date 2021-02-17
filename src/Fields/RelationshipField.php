@@ -237,6 +237,17 @@ class RelationshipField extends FieldCollection
     /// Overwrites
     //////////////////////////////////
 
+    protected function getRequestValue(Request $request)
+    {
+        $value = parent::getRequestValue($request);
+
+        if(is_string($value)) {
+            $value = [$value];
+        }
+
+        return $value;
+    }
+
     protected function checkRequest(Request $request)
     {
         return $this->strict ?
