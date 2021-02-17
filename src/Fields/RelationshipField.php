@@ -5,6 +5,7 @@ namespace MorningTrain\Laravel\Fields\Fields;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -155,6 +156,13 @@ class RelationshipField extends FieldCollection
         if ($relation instanceof HasOneOrMany) {
             $related->{$relation->getForeignKeyName()} = $model->id;
             $related->save();
+        }
+
+        if ($relation instanceof BelongsToMany) {
+            if($related->exists === false) {
+                $related->save();
+            }
+            $model->{$this->relation}()->attach($related);
         }
     }
 
