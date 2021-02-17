@@ -26,7 +26,7 @@ class RelationshipField extends FieldCollection
 
         $this->updatesAt(Field::BEFORE_SAVE);
     }
-    
+
     protected $is_single = null;
 
     public function single($is_single = true)
@@ -174,8 +174,18 @@ class RelationshipField extends FieldCollection
 
         $related = null;
 
-        if (!empty($value) && isset($value[$primary_key])) {
-            $related = $related_class::where($primary_key, $value[$primary_key])->first();
+        if (!empty($value)) {
+            $related_key = null;
+
+            if(is_string($value) || is_int($value)) {
+                $related_key = $value;
+            }
+
+            if(is_array($value) && isset($value[$primary_key])) {
+                $related_key = $value[$primary_key];
+            }
+
+            $related = $related_class::where($primary_key, $related_key)->first();
         }
 
         if ($related === null) {
