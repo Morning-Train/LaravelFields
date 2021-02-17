@@ -11,6 +11,8 @@ use MorningTrain\Laravel\Fields\Fields\StaticField;
 class Field
 {
 
+    use Illuminate\Support\Traits\Macroable;
+
     /**
      * @param null|string $name
      * @return BaseField
