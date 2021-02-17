@@ -18,7 +18,8 @@ class Field
     }
 
     /**
-     * @param null|string $name
+     * @param string $name
+     * @param null|any $value
      * @return StaticField
      */
     public static function hidden($name, $value = null)
