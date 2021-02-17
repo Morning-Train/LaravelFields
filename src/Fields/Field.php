@@ -234,6 +234,20 @@ class Field implements FieldContract
         return $this;
     }
 
+    public function updatesBefore()
+    {
+        $this->updatesAt(Field::BEFORE_SAVE);
+
+        return $this;
+    }
+
+    public function updatesAfter()
+    {
+        $this->updatesAt(Field::AFTER_SAVE);
+
+        return $this;
+    }
+
     protected function getUpdateTime(Model $model)
     {
         $updateTime = $this->updateTime;
