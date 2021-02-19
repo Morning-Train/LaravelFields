@@ -7,11 +7,12 @@ use MorningTrain\Laravel\Fields\Fields\EnumField;
 use MorningTrain\Laravel\Fields\Fields\Field as BaseField;
 use MorningTrain\Laravel\Fields\Fields\RelationshipField;
 use MorningTrain\Laravel\Fields\Fields\StaticField;
+use Illuminate\Support\Traits\Macroable;
 
 class Field
 {
 
-    use Illuminate\Support\Traits\Macroable;
+    use Macroable;
 
     /**
      * @param null|string $name
