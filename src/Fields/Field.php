@@ -271,6 +271,10 @@ class Field implements FieldContract
 
     protected function getRequestValue(Request $request)
     {
+        if ($request->hasFile($this->getRequestName())) {
+            return $request->file($this->getRequestName(), $this->defaultValue);
+        }
+
         return $request->input($this->getRequestName(), $this->defaultValue);
     }
 
