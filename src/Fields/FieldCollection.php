@@ -225,6 +225,20 @@ class FieldCollection implements FieldContract
         return $this;
     }
 
+    public function updatesBefore()
+    {
+        $this->updatesAt(FieldCollection::BEFORE_SAVE);
+
+        return $this;
+    }
+
+    public function updatesAfter()
+    {
+        $this->updatesAt(FieldCollection::AFTER_SAVE);
+
+        return $this;
+    }
+
     protected function getUpdateTime(Model $model)
     {
         $updateTime = $this->updateTime;
