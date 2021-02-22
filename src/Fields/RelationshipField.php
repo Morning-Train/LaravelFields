@@ -166,7 +166,7 @@ class RelationshipField extends FieldCollection
         }
     }
 
-    protected function updateRelated(Model $model, Request $request, string $timeline, $value, int $index)
+    protected function updateRelated(Model $model, Request $request, string $timeline, $value, $index)
     {
         $relation_type = $model->{$this->relation}();
         $related_class = $relation_type->getRelated();
