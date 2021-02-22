@@ -292,6 +292,10 @@ class RelationshipField extends FieldCollection
 
             $resolvedModel = $this->resolveModel($model, $this->getPropertyName());
 
+            if ($this->remove_missing === true && $model->{$this->relation}() instanceof BelongsToMany) {
+                $model->{$this->relation}()->detach();
+            }
+
             if (!empty($entries)) {
                 foreach ($entries as $index => $entry) {
 
@@ -310,7 +314,7 @@ class RelationshipField extends FieldCollection
                 }
             }
 
-            if ($this->remove_missing === true) {
+            if ($this->remove_missing === true && ($model->{$this->relation}() instanceof BelongsToMany) === false) {
                 $this->dbDelete ?
                     $resolvedModel->{$this->relation}()->whereNotIn('id', $ids)->delete() :
                     $resolvedModel->{$this->relation}()->whereNotIn('id', $ids)->get()->each->delete();
