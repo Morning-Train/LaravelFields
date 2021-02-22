@@ -240,7 +240,20 @@ class RelationshipField extends FieldCollection
             $request->merge($content);
         }
 
+        if($this->filter_entries_closure !== null) {
+            $value = array_filter($value, $this->filter_entries_closure);
+        }
+
         return $value;
+    }
+
+    protected $filter_entries_closure = null;
+
+    public function filterEntries(\Closure $closure)
+    {
+        $this->filter_entries_closure = $closure;
+
+        return $this;
     }
 
     //////////////////////////////////
