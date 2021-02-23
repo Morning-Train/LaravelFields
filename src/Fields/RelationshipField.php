@@ -150,7 +150,7 @@ class RelationshipField extends FieldCollection
     {
         if ($relation instanceof BelongsTo) {
             $related->save();
-            $model->{$relation->getForeignKey()} = $related->id;
+            $model->{$relation->getForeignKeyName()} = $related->id;
         }
 
         if ($relation instanceof HasOneOrMany) {
