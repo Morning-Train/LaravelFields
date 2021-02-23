@@ -240,6 +240,10 @@ class RelationshipField extends FieldCollection
             $request->merge($content);
         }
 
+        // Filter out empty values
+        $value = array_filter($value);
+
+        // Apply custom filter if present
         if($this->filter_entries_closure !== null) {
             $value = array_filter($value, $this->filter_entries_closure);
         }
