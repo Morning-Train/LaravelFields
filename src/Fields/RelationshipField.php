@@ -310,9 +310,6 @@ class RelationshipField extends FieldCollection
                         $resolvedModel->save();
                     }
 
-                    // Run after update
-                    $this->runAfterUpdate($model);
-
                     $ids[] = $related->id;
 
                 }
@@ -323,6 +320,9 @@ class RelationshipField extends FieldCollection
                     $resolvedModel->{$this->relation}()->whereNotIn('id', $ids)->delete() :
                     $resolvedModel->{$this->relation}()->whereNotIn('id', $ids)->get()->each->delete();
             }
+
+            // Run after update
+            $this->runAfterUpdate($model);
 
         }
     }
