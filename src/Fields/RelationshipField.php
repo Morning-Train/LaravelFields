@@ -162,7 +162,7 @@ class RelationshipField extends FieldCollection
             if($related->exists === false) {
                 $related->save();
             }
-            $model->{$this->relation}()->attach($related);
+            $model->{$this->relation}()->syncWithoutDetaching($related);
         }
     }
 
