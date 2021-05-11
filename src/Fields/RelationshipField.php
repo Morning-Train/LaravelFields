@@ -296,10 +296,6 @@ class RelationshipField extends FieldCollection
 
             $resolvedModel = $this->resolveModel($model, $this->getPropertyName());
 
-            if ($this->remove_missing === true && $model->{$this->relation}() instanceof BelongsToMany) {
-                $model->{$this->relation}()->detach();
-            }
-
             if (!empty($entries)) {
                 foreach ($entries as $index => $entry) {
 
@@ -313,6 +309,10 @@ class RelationshipField extends FieldCollection
                     $ids[] = $related->id;
 
                 }
+            }
+
+            if ($this->remove_missing === true && $model->{$this->relation}() instanceof BelongsToMany) {
+                $model->{$this->relation}()->sync($ids);
             }
 
             if ($this->remove_missing === true && ($model->{$this->relation}() instanceof BelongsToMany) === false) {
