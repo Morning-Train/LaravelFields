@@ -248,6 +248,8 @@ class RelationshipField extends FieldCollection
             $value = array_filter($value, $this->filter_entries_closure);
         }
 
+        $value = $this->runBefore($model, $value);
+
         return $value;
     }
 

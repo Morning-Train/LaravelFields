@@ -283,6 +283,28 @@ class FieldCollection implements FieldContract
         }
     }
 
+    /**
+     * @var Closure
+     */
+    protected $before_callback;
+
+    public function before(Closure $callback)
+    {
+        $this->before_callback = $callback;
+        return $this;
+    }
+
+    protected function runBefore(Model $model, $value)
+    {
+        $before = $this->before_callback;
+
+        if ($before instanceof Closure) {
+            return $before($model, $value);
+        }
+
+        return $value;
+    }
+
     public function update(Model $model, Request $request, string $timeline)
     {
         if (($this->getUpdateTime($model) !== $timeline) && ($this->getUpdateTime($model) !== Field::BOTH)) {
