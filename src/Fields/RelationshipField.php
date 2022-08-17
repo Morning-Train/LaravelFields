@@ -123,7 +123,7 @@ class RelationshipField extends FieldCollection
             $collection = $this->fields;
 
         } else {
-            if (method_exists($this->resource, 'getFields')) {
+            if ($this->resource !== null && method_exists($this->resource, 'getFields')) {
                 $collection = $this->resource::getFields();
             }
         }
